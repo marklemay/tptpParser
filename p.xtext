@@ -5,111 +5,115 @@ generate myDsl "http://www.xtext.org/example/mydsl/MyDsl"
 
 //org.xtext.example.mydsl.Terminals
 Model:
-	TPTP_input+=thf_input*
-	|TPTP_input+=cnf_input*;
+	TPTP_input+=thf_include* 
+        (TPTP_input+=thf_input*
+        |TPTP_input+=cnf_input*);
 
 cnf_input:
-	cnf_annotated | cnf_include//| thf_include;
-;
+        cnf_annotated | thf_include;
+
+
+//sublanguages should not be mixable, even on import
+
+thf_input:
+        thf_annotated | thf_include;
+
 cnf_annotated:
-	'cnf(' name=LOWER_TOKEN //TODO: spec
-	',' formula_role=('axiom'|'hypothesis'|'negated_conjecture') //TODO: <formula_role> //TODO: tooltip docs!
-	',' def=cnf_formula_type_definition //TODO: spec
-	//TODO: <annotations>
-	').'
-; 
+        'cnf(' name=LOWER_TOKEN //TODO: spec
+        ',' formula_role=('axiom'|'hypothesis'|'negated_conjecture') //TODO: <formula_role> //TODO: tooltip docs!
+        ',' def=cnf_formula_type_definition //TODO: spec
+        //TODO: <annotations>
+        ').'
+;
 
 cnf_formula_type_definition:
-	'(' disjunction=cnf_or ')' |
-	disjunction=cnf_or;
+        '(' disjunction=cnf_or ')' |
+        disjunction=cnf_or;
 
 cnf_or:
-	or+=cnf_not ('|' or+=cnf_not)*
+        or+=cnf_not ('|' or+=cnf_not)*
 ;
 
 cnf_not:
-	(negated?='~')? literal=cnf_equality; //TODO: cange nagated to something that is true when the formula is true and false otherwise
+        (negated?='~')? literal=cnf_equality; //TODO: cange nagated to something that is true when the formula is true and false otherwise
 
-cnf_equality: exp=cnf_exp (eq=('='|'!=') exp=cnf_exp )?;
+//TODO: merge down
+cnf_equality: expL=cnf_exp (eq=('='|'!=') expR=cnf_exp )?;
 
 //TODO: file bug report:
 //cnf_not:
-//	('~')? (cnf_exp | cnf_equality);
+//        ('~')? (cnf_exp | cnf_equality);
 //
 //cnf_equality: cnf_exp '=' cnf_exp;
 
-cnf_exp: cnf_constant | cnf_var | cnf_statment_literal;
+cnf_exp: cnf_constant | cnf_var | cnf_exp=cnf_statment_literal;
 
 cnf_constant:
-	name=(LOWER_TOKEN | STRING) ('('param=cnf_exp(','param=cnf_exp)*')')?
+        name=(LOWER_TOKEN | STRING) ('('param+=cnf_exp(','param+=cnf_exp)*')')?
 ;
 cnf_var:
-	name=UPPER_TOKEN
+        name=UPPER_TOKEN
 ;
 cnf_include:
-	'include(' name=STRING ').';
+        'include(' name=STRING ').';
 
 //TODO: tooltip doc
 //TODO: make more DRY
 cnf_statment_literal:'$true'|'$false';
 
 
-//sublanguages should not be mixable, even on import
-
-thf_input:
-	thf_annotated | thf_include;
 
 //TODO: compile time type checking would be super cool
 
 //TODO: should only be able to import file of the same language
 //TODO: import magic
 thf_include:
-	'include(' name=STRING ').';
+        'include(' path=STRING ').';
 
 thf_annotated:
-	'thf(' name=LOWER_TOKEN //TODO: spec
-	',' 'type' //TODO: <formula_role> //TODO: tooltip docs!
-	',' def=thf_formula_type_definition //TODO: spec
-	//TODO: <annotations>
-	').'
-	|
-	'thf(' name=LOWER_TOKEN //TODO: spec
-	',' 'axiom' //TODO: <formula_role> //TODO: tooltip docs!
-	',' thf_statment //TODO: spec
-	//TODO: <annotations>
-	').'
-	|
-	'thf(' name=LOWER_TOKEN //TODO: spec
-	',' 'hypothesis' //TODO: <formula_role> //TODO: tooltip docs!
-	',' thf_statment //TODO: spec
-	//TODO: <annotations>
-	').'
-	|
-	'thf(' name=LOWER_TOKEN //TODO: spec
-	',' 'conjecture' //TODO: <formula_role> //TODO: tooltip docs!
-	',' thf_statment //TODO: spec
-	//TODO: <annotations>
-	').'
-	//TODO: warn against the other <formula_role> types
-	;
+        'thf(' name=LOWER_TOKEN //TODO: spec
+        ',' 'type' //TODO: <formula_role> //TODO: tooltip docs!
+        ',' def=thf_formula_type_definition //TODO: spec
+        //TODO: <annotations>
+        ').'
+        |
+        'thf(' name=LOWER_TOKEN //TODO: spec
+        ',' 'axiom' //TODO: <formula_role> //TODO: tooltip docs!
+        ',' thf_statment //TODO: spec
+        //TODO: <annotations>
+        ').'
+        |
+        'thf(' name=LOWER_TOKEN //TODO: spec
+        ',' 'hypothesis' //TODO: <formula_role> //TODO: tooltip docs!
+        ',' thf_statment //TODO: spec
+        //TODO: <annotations>
+        ').'
+        |
+        'thf(' name=LOWER_TOKEN //TODO: spec
+        ',' 'conjecture' //TODO: <formula_role> //TODO: tooltip docs!
+        ',' thf_statment //TODO: spec
+        //TODO: <annotations>
+        ').'
+        //TODO: warn against the other <formula_role> types
+        ;
 
 thf_formula_type_definition:
-	'(' thf_formula_type_definition ')' |
-	((name=LOWER_TOKEN | name=STRING) ':' thf_type_expresion);
+        '(' thf_formula_type_definition ')' |
+        ((name=LOWER_TOKEN | name=STRING) ':' thf_type_expresion);
 
 //TODO: tooltip docs!
 thf_type_name:
-	'$i' | '$o' | '$tType' | LOWER_TOKEN; //type=[thf_formula_type_definition]
-	
+        '$i' | '$o' | '$tType' | LOWER_TOKEN; //type=[thf_formula_type_definition]
+        
 thf_type_expresion:
-	thf_terminal_type_expresion ('>' thf_terminal_type_expresion)*;
-	 //type=[thf_formula_type_definition]
+        thf_terminal_type_expresion ('>' thf_terminal_type_expresion)*;
+         //type=[thf_formula_type_definition]
 thf_terminal_type_expresion:
-	thf_type_name | '('thf_type_expresion')';
+        thf_type_name | '('thf_type_expresion')';
 
-thf_statment: 
-	thf_terminal_statment (('&' | '=>' | '|'
-		|'@'// (denoting apply) is left-associative and lambda is right-associative. //TODO:  deal with asocativity crap
+thf_statment:
+        thf_terminal_statment (('&' | '=>' | '|'
+                |'@'// (denoting apply) is left-associative and lambda is right-associative. //TODO: deal with asocativity crap
 //^ [X] : ^ [Y] : f @ g (where f is a <thf_apply_formula> and g is a
 //<thf_unitary_formula>) should be parsed as: (^ [X] : (^ [Y] : f)) @ g.
 //That is, g is not in the scope of either lambda.
@@ -118,21 +122,21 @@ thf_statment:
 |'<='
 |'<=>'
 |'<~>'
-	) thf_terminal_statment)*
+        ) thf_terminal_statment)*
 ;
 
-//TODO: this fails silently  (THE WORST KIND OF FAILURE)  report as bug!
-//thf_statment: 
-//	thf_terminal_statment ('&' thf_terminal_statment)? 
-//	| thf_terminal_statment ('|' thf_terminal_statment)?
-//	| thf_terminal_statment ('=>' thf_terminal_statment)?
+//TODO: this fails silently (THE WORST KIND OF FAILURE) report as bug!
+//thf_statment:
+//        thf_terminal_statment ('&' thf_terminal_statment)?
+//        | thf_terminal_statment ('|' thf_terminal_statment)?
+//        | thf_terminal_statment ('=>' thf_terminal_statment)?
 //;
 
 //
 thf_terminal_statment:'('thf_statment')' | '~' thf_statment | statment_literal | LOWER_TOKEN | UPPER_TOKEN | STRING
-	| ('!'| '?'|'^') //what the hell do these mean???
-	'[' crappy_type_definition (','crappy_type_definition)* ']' ':'thf_statment
-	//|'!'thf_statment_variable_list ':'
+        | ('!'| '?'|'^') //what the hell do these mean???
+        '[' crappy_type_definition (','crappy_type_definition)* ']' ':'thf_statment
+        //|'!'thf_statment_variable_list ':'
 ;
 
 crappy_type_definition:(LOWER_TOKEN |UPPER_TOKEN | STRING)':' thf_type_expresion;
@@ -146,13 +150,13 @@ thf_statment_variable_list:'['vars+=thf_formula_type_definition (','vars+=thf_fo
 statment_literal:'$true'|'$false';
 
 Anything:
-	'(' Anything ')' | ID* | ANY_OTHER*;
+        '(' Anything ')' | ID* | ANY_OTHER*;
 
-	//thf_type_statment;
+        //thf_type_statment;
 //'Hello' name=ID '!';
 //
 thf_type:
-	name='%i' | name='%o'; // | thf_formula_type_definition;
+        name='%i' | name='%o'; // | thf_formula_type_definition;
  //
 //thf_type_statment: type=thf_type |'('thf_type_statment')';// | left=thf_type_statment '>' right=thf_type_statment;
 //
@@ -163,27 +167,26 @@ thf_type:
 //grammar org.eclipse.xtext.common.Terminals hidden(WS, ML_COMMENT, SL_COMMENT)
 
 terminal LOWER_TOKEN:
-	('a'..'z' | '_' | '0'..'9' ) ('a'..'z' | 'A'..'Z' | '_' | '0'..'9')*;
+        ('a'..'z' | '_' | '0'..'9' ) ('a'..'z' | 'A'..'Z' | '_' | '0'..'9')*;
 
 terminal UPPER_TOKEN:
-	('A'..'Z') ('a'..'z' | 'A'..'Z' | '_' | '0'..'9')*;
+        ('A'..'Z') ('a'..'z' | 'A'..'Z' | '_' | '0'..'9')*;
 
 terminal ID:
-	'^'? ('a'..'z' | 'A'..'Z' | '_') ('a'..'z' | 'A'..'Z' | '_' | '0'..'9')*;
+        '^'? ('a'..'z' | 'A'..'Z' | '_') ('a'..'z' | 'A'..'Z' | '_' | '0'..'9')*;
 
 terminal STRING:
-	'"' ('\\' ('b' | 't' | 'n' | 'f' | 'r' | 'u' | '"' | "'" | '\\') | !('\\' | '"'))* '"' |
-	"'" ('\\' ('b' | 't' | 'n' | 'f' | 'r' | 'u' | '"' | "'" | '\\') | !('\\' | "'"))* "'";
+        '"' ('\\' ('b' | 't' | 'n' | 'f' | 'r' | 'u' | '"' | "'" | '\\') | !('\\' | '"'))* '"' |
+        "'" ('\\' ('b' | 't' | 'n' | 'f' | 'r' | 'u' | '"' | "'" | '\\') | !('\\' | "'"))* "'";
 
 terminal ML_COMMENT:
-	'/*'->'*/';
+        '/*'->'*/';
 
 terminal SL_COMMENT:
-	'%' !('\n' | '\r')* ('\r'? '\n')?;
+        '%' !('\n' | '\r')* ('\r'? '\n')?;
 
 terminal WS:
-	(' ' | '\t' | '\r' | '\n')+;
+        (' ' | '\t' | '\r' | '\n')+;
 
 terminal ANY_OTHER:
-	.;
-
+        .;
