@@ -15,10 +15,12 @@ The design principles are:
  * keep the eventual java parser and the eventual eclipse plugin (and the target tptp problem set in sync with version numbers)
 
 global TODOs:
+ * what is the best way to do this? http://stackoverflow.com/questions/20253044/string-constants-causeing-unexpected-type-collisions-in-xtext/20280540?noredirect=1#20280540
  * seperate antlr parser directory (may just be a copy and past procedure)
  * eclipse download site
  * deploy to maven
  * Continous integration setup
+ * seperate sublangues into seperate files
  * autoformater
  * tooltip hints
  * compiletime validation of linking and type checking
