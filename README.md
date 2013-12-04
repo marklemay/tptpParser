@@ -15,8 +15,11 @@ The design principles are:
  * keep the eventual java parser and the eventual eclipse plugin (and the target tptp problem set in sync with version numbers)
 
 global TODOs:
+ * seperate antlr parser directory (may just be a copy and past procedure)
  * eclipse download site
  * deploy to maven
+ * Continous integration setup
+ * autoformater
  * tooltip hints
  * compiletime validation of linking and type checking
  * comment meta info tagging
