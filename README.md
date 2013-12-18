@@ -24,6 +24,7 @@ global TODOs:
  * seperate sublangues into seperate files
  * autoformater
  * tooltip hints
+ * file linking with the include directive (include from only the same language)
  * compiletime validation of linking and type checking
  * comment meta info tagging
  * seperate eclipse plugins that could just target the sublanguages? most users don't need all 4
