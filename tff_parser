@@ -1,0 +1,137 @@
+grammar org.xtext.example.mydsl.MyDsl hidden(WS, ML_COMMENT, SL_COMMENT) //with org.eclipse.xtext.common.Terminals
+//with org.eclipse.xtext.common.Terminals
+import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+generate myDsl "http://www.xtext.org/example/mydsl/MyDsl"
+
+//org.xtext.example.mydsl.Terminals
+Model:
+        TPTP_input+=include*
+        (TPTP_input+=tff_input*);
+
+include:
+        'include(' path=STRING ').';
+
+tff_input:
+        tff_annotated | include;
+
+tff_annotated:
+       ('tff(' name=(LOWER_TOKEN|STRING) //TODO: spec
+        ',' formula_role=('axiom' | 'hypothesis' | 'negated_conjecture' | 'conjecture' | 'definition' | 'lemma') 
+        ',' def=tff_expression //TODO: spec
+        //TODO: <annotations>
+        ').')
+        |
+        (
+       'tff(' name=(LOWER_TOKEN|STRING) //TODO: spec
+        ',' formula_role=('type') 
+        ',' def=tff_formula_type_definition //TODO: spec
+        //TODO: <annotations>
+        ').')
+        ;
+
+tff_formula_type_definition:
+		'(' tff_formula_type_definition ')' |
+        ((name=LOWER_TOKEN | name=STRING) ':' exp=tff_type_expression);
+	
+tff_type_expression:
+	tff_terminal_type_expression ({oper.left=current} op=('>' | '*') right+=tff_terminal_type_expression)*;
+         
+tff_terminal_type_expression returns tff_type_expression:
+	tff_type_name | '('tff_type_expression')';
+
+	
+tff_type_name:
+        '$i' | '$o' | '$tType' | '$int' | LOWER_TOKEN; //type=[tff_formula_type_definition]
+        
+tff_expression:
+        tff_terminating_expression ({binary.left=current} op=binary_operator right=tff_terminating_expression)*
+        //tff_exists |
+        //tff_for_all |
+        ;
+
+tff_terminating_expression returns tff_expression:
+        atom=tff_atom |
+        '(' exp=tff_expression ')' |
+        negation?='~' exp=tff_expression |
+        exp=tff_exists |
+        exp=tff_for_all
+;
+
+tff_atom:
+        tff_constant | 
+        tff_var | 
+        tff_statement_literal |
+        tff_predefined_function_2_args
+;
+
+tff_statement_literal returns tff_atom:
+        atom=('$true' |
+        '$false')
+        //TODO: rename?
+;
+
+tff_constant:
+        name=(LOWER_TOKEN | STRING) ('('param+=tff_atom(','param+=tff_atom)*')')?
+;
+
+//tff_predefined_constant:;
+
+tff_predefined_function_2_args:
+	'$less' '(' first=tff_expression ',' second=tff_expression ')';
+
+
+//tff_predefined_type:;
+
+tff_var:
+        name=UPPER_TOKEN; 
+        
+tff_var_declaration:
+        tff_var ':' vartype=tff_type_expression; 
+        
+        
+tff_exists returns tff_expression:
+        '?' '[' param=tff_variable_list ']' ':' exp=tff_expression
+;
+
+tff_for_all returns tff_expression:
+        '!' '[' param=tff_variable_list ']' ':' exp=tff_expression
+;
+
+tff_variable_list:
+        params+=tff_var_declaration (',' params+=tff_var_declaration)*
+;
+
+binary_operator:
+        '!=' | '=' | '|' | '&' | '=>' | '<=>' | '<=' | '<~>' | '~|' | '~&' 
+        //The binary connectives are infix | for disjunction, 
+        //infix & for conjunction, infix <=> for equivalence, 
+        //infix => for implication, infix <= for reverse implication, 
+        //infix <~> for non-equivalence (XOR), infix ~| for negated disjunction (NOR), 
+        //infix ~& for negated conjunction (NAND), infix @ for application.
+;
+
+
+terminal LOWER_TOKEN:
+        ('a'..'z' | '_' | '-' | '.' | '0'..'9' ) ('a'..'z' | 'A'..'Z' | '_' | '-' | '.' | '0'..'9')*;
+
+terminal UPPER_TOKEN:
+        ('A'..'Z') ('a'..'z' | 'A'..'Z' | '_' | '-' | '.' | '0'..'9')*;
+
+terminal ID:
+        '^'? ('a'..'z' | 'A'..'Z' | '_') ('a'..'z' | 'A'..'Z' | '_' | '0'..'9')*;
+
+terminal STRING:
+        '"' ('\\' ('b' | 't' | 'n' | 'f' | 'r' | 'u' | '"' | "'" | '\\') | !('\\' | '"'))* '"' |
+        "'" ('\\' ('b' | 't' | 'n' | 'f' | 'r' | 'u' | '"' | "'" | '\\') | !('\\' | "'"))* "'";
+
+terminal ML_COMMENT:
+        '/*'->'*/';
+
+terminal SL_COMMENT:
+        '%' !('\n' | '\r')* ('\r'? '\n')?;
+
+terminal WS:
+        (' ' | '\t' | '\r' | '\n')+;
+
+terminal ANY_OTHER:
+        .;
