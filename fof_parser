@@ -15,8 +15,8 @@ fof_input:
 	fof_annotated | include;
 
 fof_annotated:
-	'fof(' name=LOWER_TOKEN //TODO: spec
-	',' formula_role=('axiom' | 'hypothesis' | 'negated_conjecture' | 'conjecture') //TODO: <formula_role> //TODO: tooltip docs!
+       'fof(' name=(LOWER_TOKEN|STRING) //TODO: spec
+        ',' formula_role=('axiom' | 'hypothesis' | 'negated_conjecture' | 'conjecture' | 'definition' | 'lemma') 
 	',' def=fof_expression //TODO: spec
 	//TODO: <annotations>
 	').';
@@ -77,12 +77,11 @@ binary_operator:
 ;
 
 
-
 terminal LOWER_TOKEN:
-	('a'..'z' | '_' | '0'..'9') ('a'..'z' | 'A'..'Z' | '_' | '0'..'9')*;
+        ('a'..'z' | '_' | '-' | '.' | '0'..'9' ) ('a'..'z' | 'A'..'Z' | '_' | '-' | '.' | '0'..'9')*;
 
 terminal UPPER_TOKEN:
-	('A'..'Z') ('a'..'z' | 'A'..'Z' | '_' | '0'..'9')*;
+        ('A'..'Z') ('a'..'z' | 'A'..'Z' | '_' | '-' | '.' | '0'..'9')*;
 
 terminal ID:
 	'^'? ('a'..'z' | 'A'..'Z' | '_') ('a'..'z' | 'A'..'Z' | '_' | '0'..'9')*;
