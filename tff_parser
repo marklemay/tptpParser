@@ -77,7 +77,10 @@ tff_constant:
 //tff_predefined_constant:;
 
 tff_predefined_function_2_args:
-	'$less' '(' first=tff_expression ',' second=tff_expression ')';
+	('$less' | '$uminus' | '$sum' | '$difference' | '$product' |
+         '$quotient' | '$quotient_e' | '$quotient_t' | '$quotient_f' |
+         '$remainder_e' | '$remainder_t' | '$remainder_f')
+         '(' first=tff_expression ',' second=tff_expression ')';
 
 
 //tff_predefined_type:;
