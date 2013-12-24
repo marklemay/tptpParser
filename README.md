@@ -17,6 +17,9 @@ The design principles are:
 
 global TODOs:
  * what is the best way to do this? http://stackoverflow.com/questions/20253044/string-constants-causeing-unexpected-type-collisions-in-xtext/20280540?noredirect=1#20280540
+ * merge the seperate implimentations, make things handld more consistently
+ * review the modles for name clarity (and spelling)
+ * review prolog number, variable, and constant syntax
  * seperate antlr parser directory (may just be a copy and past procedure)
  * eclipse download site
  * deploy to maven
