@@ -1,0 +1,104 @@
+grammar org.xtext.example.mydsl.MyDsl hidden(WS, ML_COMMENT, SL_COMMENT) //with org.eclipse.xtext.common.Terminals
+//with org.eclipse.xtext.common.Terminals
+import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+generate myDsl "http://www.xtext.org/example/mydsl/MyDsl"
+
+//org.xtext.example.mydsl.Terminals
+Model:
+	TPTP_input+=include*
+	(TPTP_input+=fof_input*);
+
+include:
+	'include(' path=STRING ').';
+
+fof_input:
+	fof_annotated | include;
+
+fof_annotated:
+	'fof(' name=LOWER_TOKEN //TODO: spec
+	',' formula_role=('axiom' | 'hypothesis' | 'negated_conjecture' | 'conjecture') //TODO: <formula_role> //TODO: tooltip docs!
+	',' def=fof_expression //TODO: spec
+	//TODO: <annotations>
+	').';
+
+fof_expression:
+	fof_terminating_expression ({binary.left=current} op=binary_operator right=fof_terminating_expression)*
+	//fof_exists |
+	//fof_for_all |
+	;
+
+fof_terminating_expression returns fof_expression:
+	atom=fof_atom |
+	'(' exp=fof_expression ')' |
+	negation?='~' exp=fof_expression |
+	exp=fof_exists |
+	exp=fof_for_all
+;
+
+fof_atom:
+	fof_constant | 
+	fof_var | 
+	fof_statement_literal
+;
+
+fof_statement_literal returns fof_atom:
+	atom=('$true' |
+	'$false')
+	//TODO: rename?
+;
+
+fof_constant:
+        name=(LOWER_TOKEN | STRING) ('('param+=fof_atom(','param+=fof_atom)*')')?
+;
+
+fof_var:
+        name=UPPER_TOKEN
+        ;
+        
+fof_exists returns fof_expression:
+	'?' '[' param=fof_variable_list ']' ':' exp=fof_expression
+;
+
+fof_for_all returns fof_expression:
+	'!' '[' param=fof_variable_list ']' ':' exp=fof_expression
+;
+
+fof_variable_list:
+	params+=fof_var (',' params+=fof_var)*
+;
+
+binary_operator:
+	'!=' | '=' | '|' | '&' | '=>' | '<=>' | '<=' | '<~>' | '~|' | '~&' 
+	//The binary connectives are infix | for disjunction, 
+	//infix & for conjunction, infix <=> for equivalence, 
+	//infix => for implication, infix <= for reverse implication, 
+	//infix <~> for non-equivalence (XOR), infix ~| for negated disjunction (NOR), 
+	//infix ~& for negated conjunction (NAND), infix @ for application.
+;
+
+
+
+terminal LOWER_TOKEN:
+	('a'..'z' | '_' | '0'..'9') ('a'..'z' | 'A'..'Z' | '_' | '0'..'9')*;
+
+terminal UPPER_TOKEN:
+	('A'..'Z') ('a'..'z' | 'A'..'Z' | '_' | '0'..'9')*;
+
+terminal ID:
+	'^'? ('a'..'z' | 'A'..'Z' | '_') ('a'..'z' | 'A'..'Z' | '_' | '0'..'9')*;
+
+terminal STRING:
+	'"' ('\\' ('b' | 't' | 'n' | 'f' | 'r' | 'u' | '"' | "'" | '\\') | !('\\' | '"'))* '"' |
+	"'" ('\\' ('b' | 't' | 'n' | 'f' | 'r' | 'u' | '"' | "'" | '\\') | !('\\' | "'"))* "'";
+
+terminal ML_COMMENT:
+	'/*'->'*/';
+
+terminal SL_COMMENT:
+	'%' !('\n' | '\r')* ('\r'? '\n')?;
+
+terminal WS:
+	(' ' | '\t' | '\r' | '\n')+;
+
+terminal ANY_OTHER:
+	.;
