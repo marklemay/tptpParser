@@ -5,137 +5,145 @@ generate myDsl "http://www.xtext.org/example/mydsl/MyDsl"
 
 //org.xtext.example.mydsl.Terminals
 Model:
-        TPTP_input+=include*
-        (TPTP_input+=tff_input*);
+	TPTP_input+=include*
+	(TPTP_input+=tff_input*);
 
 include:
-        'include(' path=STRING ').';
+	'include(' path=STRING ').';
 
 tff_input:
-        tff_annotated | include;
+	tff_annotated | include;
 
 tff_annotated:
-       ('tff(' name=(LOWER_TOKEN|STRING) //TODO: spec
-        ',' formula_role=('axiom' | 'hypothesis' | 'negated_conjecture' | 'conjecture' | 'definition' | 'lemma') 
-        ',' def=tff_expression //TODO: spec
-        //TODO: <annotations>
-        ').')
-        |
-        (
-       'tff(' name=(LOWER_TOKEN|STRING) //TODO: spec
-        ',' formula_role=('type') 
-        ',' def=tff_formula_type_definition //TODO: spec
-        //TODO: <annotations>
-        ').')
-        ;
+	('tff(' name=(LOWER_TOKEN | STRING)
+	',' formula_role=('axiom' | 'hypothesis' | 'negated_conjecture' | 'conjecture' | 'definition' | 'lemma')
+	',' def=tff_expression
+	//TODO: <annotations>?
+	').')
+	|
+	('tff(' name=(LOWER_TOKEN | STRING)
+	',' formula_role=('type')
+	',' def=tff_formula_type_definition
+	//TODO: <annotations>?
+	').');
 
 tff_formula_type_definition:
-		'(' tff_formula_type_definition ')' |
-        ((name=LOWER_TOKEN | name=STRING) ':' exp=tff_type_expression);
-	
+	'(' tff_formula_type_definition ')' |
+	((name=LOWER_TOKEN | name=STRING) ':' exp=(tff_type_quantifier_epression|tff_type_expression));
+
 tff_type_expression:
 	tff_terminal_type_expression ({oper.left=current} op=('>' | '*') right+=tff_terminal_type_expression)*;
-         
-tff_terminal_type_expression returns tff_type_expression:
-	tff_type_name | '('tff_type_expression')';
 
-	
-tff_type_name:
-        '$i' | '$o' | '$tType' | '$int' | LOWER_TOKEN; //type=[tff_formula_type_definition]
-        
+tff_terminal_type_expression returns tff_type_expression:
+	tff_type_atom | '(' tff_type_expression ')';
+
+tff_type_atom:
+	tff_type_constant |
+	tff_var |
+	tff_type_literal ;
+
+tff_type_constant:
+	name=(LOWER_TOKEN | STRING) ('(' param+=tff_type_atom (',' param+=tff_type_atom)* ')')?;
+
+tff_type_literal returns tff_type_atom:
+	tff_type_atom =('$i' | '$o' | '$tType' | '$int' | '$real' | '$rat');
+
 tff_expression:
-        tff_terminating_expression ({binary.left=current} op=binary_operator right=tff_terminating_expression)*
-        //tff_exists |
-        //tff_for_all |
-        ;
+	tff_terminating_expression ({binary.left=current} op=binary_operator right=tff_terminating_expression)*
+;
 
 tff_terminating_expression returns tff_expression:
-        atom=tff_atom |
-        '(' exp=tff_expression ')' |
-        negation?='~' exp=tff_expression |
-        exp=tff_exists |
-        exp=tff_for_all
+	atom=tff_atom |
+	'(' exp=tff_expression ')' |
+	negation?='~' exp=tff_expression |
+	exp=tff_quantifier_epression
 ;
 
 tff_atom:
-        tff_constant | 
-        tff_var | 
-        tff_statement_literal |
-        tff_predefined_function_2_args
-;
+	tff_atom_literal |
+	tff_constant |
+	tff_var |
+	tff_predefined_function_1_args |
+	tff_predefined_function_2_args;
 
-tff_statement_literal returns tff_atom:
-        atom=('$true' |
-        '$false')
-        //TODO: rename?
+tff_atom_literal returns tff_atom:
+	tff_atom=('$true' |
+	'$false')
 ;
 
 tff_constant:
-        name=(LOWER_TOKEN | STRING) ('('param+=tff_atom(','param+=tff_atom)*')')?
-;
+	(name=(LOWER_TOKEN | STRING) ('(' param+=tff_atom (',' param+=tff_atom)* ')')?)
+	| ( top=(LOWER_TOKEN) name='/' bottom=(LOWER_TOKEN));//TODO: what is the best way to represent these horrible fraction types
 
-//tff_predefined_constant:;
+	//tff_predefined_constant:;
+tff_predefined_function_1_args returns tff_constant:
+	name=('$is_int' | '$is_rat' //ANYTHING -> BOOL
+	| '$uminus' // NUM -> NUM ?
+	| '$to_int' //ANYTHING? -> INT
+	| '$to_rat' //ANYTHING? -> RAT
+	| '$to_real' //ANYTHING? -> REAL
+)
+	'(' param+=tff_expression ')';
 
-tff_predefined_function_2_args:
-	('$less' | '$uminus' | '$sum' | '$difference' | '$product' |
-         '$quotient' | '$quotient_e' | '$quotient_t' | '$quotient_f' |
-         '$remainder_e' | '$remainder_t' | '$remainder_f' | '$greatereq'
-         | '$lesseq' | '$greater' | '$eq')
-         '(' first=tff_expression ',' second=tff_expression ')';
-
-
-//tff_predefined_type:;
+tff_predefined_function_2_args :
+	//TODO: rename
+	func=('$less' | '$sum' | '$difference' | '$product' |
+	'$quotient' | '$quotient_e' | '$quotient_t' | '$quotient_f' |
+	'$remainder_e' | '$remainder_t' | '$remainder_f' | '$greatereq'
+	| '$lesseq' | '$greater' | '$eq'
+	//also $distinct
+	)
+	'(' param+=tff_expression ',' param+=tff_expression ')';
 
 tff_var:
-        name=UPPER_TOKEN; 
-        
-tff_var_declaration:
-        tff_var ':' vartype=tff_type_expression; 
-        
-        
-tff_exists returns tff_expression:
-        '?' '[' param=tff_variable_list ']' ':' exp=tff_expression
-;
+	name=UPPER_TOKEN;
 
-tff_for_all returns tff_expression:
-        '!' '[' param=tff_variable_list ']' ':' exp=tff_expression
-;
+tff_var_declaration:
+	var=tff_var ':' vartype=tff_type_expression;
+
+tff_quantifier_epression returns tff_expression:
+	quantifier=(
+	'!' // for all
+	| '?'//there exists
+	) '[' param=tff_variable_list ']' ':' exp=tff_expression;
+
+
+tff_type_quantifier_epression returns tff_expression:
+	quantifier=(
+	'!>'//????
+	) '[' param=tff_variable_list ']' ':' exp=tff_type_expression;  //TODO: the syntax colisions here are insane! what does ":" mean?
 
 tff_variable_list:
-        params+=tff_var_declaration (',' params+=tff_var_declaration)*
-;
+	params+=tff_var_declaration (',' params+=tff_var_declaration)*;
 
 binary_operator:
-        '!=' | '=' | '|' | '&' | '=>' | '<=>' | '<=' | '<~>' | '~|' | '~&' 
-        //The binary connectives are infix | for disjunction, 
-        //infix & for conjunction, infix <=> for equivalence, 
-        //infix => for implication, infix <= for reverse implication, 
-        //infix <~> for non-equivalence (XOR), infix ~| for negated disjunction (NOR), 
-        //infix ~& for negated conjunction (NAND), infix @ for application.
+	'!=' | '=' | '|' | '&' | '=>' | '<=>' | '<=' | '<~>' | '~|' | '~&'
+	//The binary connectives are infix | for disjunction, 
+	//infix & for conjunction, infix <=> for equivalence, 
+	//infix => for implication, infix <= for reverse implication, 
+	//infix <~> for non-equivalence (XOR), infix ~| for negated disjunction (NOR), 
+	//infix ~& for negated conjunction (NAND), infix @ for application.
 ;
 
+//TODO: treate munber distinctly from UPPER_TOKEN and LOWER_TOKEN 
+//terminal NUMBER:
+//	'-'? ('0'..'9')+;
 
 terminal LOWER_TOKEN:
-        ('a'..'z' | '_' | '-' | '.' | '0'..'9' ) ('a'..'z' | 'A'..'Z' | '_' | '-' | '.' | '0'..'9')*;
+	('a'..'z' | '_' | '-' | '.' | '0'..'9') ('a'..'z' | 'A'..'Z' | '_' | '-' | '.' | '0'..'9')*;
 
 terminal UPPER_TOKEN:
-        ('A'..'Z') ('a'..'z' | 'A'..'Z' | '_' | '-' | '.' | '0'..'9')*;
-
-terminal ID:
-        '^'? ('a'..'z' | 'A'..'Z' | '_') ('a'..'z' | 'A'..'Z' | '_' | '0'..'9')*;
+	('A'..'Z') ('a'..'z' | 'A'..'Z' | '_' | '-' | '.' | '0'..'9')*;
 
 terminal STRING:
-        '"' ('\\' ('b' | 't' | 'n' | 'f' | 'r' | 'u' | '"' | "'" | '\\') | !('\\' | '"'))* '"' |
-        "'" ('\\' ('b' | 't' | 'n' | 'f' | 'r' | 'u' | '"' | "'" | '\\') | !('\\' | "'"))* "'";
+	'"' ('\\' ('b' | 't' | 'n' | 'f' | 'r' | 'u' | '"' | "'" | '\\') | !('\\' | '"'))* '"' |
+	"'" ('\\' ('b' | 't' | 'n' | 'f' | 'r' | 'u' | '"' | "'" | '\\') | !('\\' | "'"))* "'";
 
 terminal ML_COMMENT:
-        '/*'->'*/';
+	'/*'->'*/';
 
 terminal SL_COMMENT:
-        '%' !('\n' | '\r')* ('\r'? '\n')?;
+	'%' !('\n' | '\r')* ('\r'? '\n')?;
 
 terminal WS:
-        (' ' | '\t' | '\r' | '\n')+;
-
-terminal ANY_OTHER:
-        .;
+	(' ' | '\t' | '\r' | '\n')+;
