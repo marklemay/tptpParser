@@ -1,9 +1,8 @@
-grammar org.xtext.example.mydsl.MyDsl hidden(WS, ML_COMMENT, SL_COMMENT) //with org.eclipse.xtext.common.Terminals
-//with org.eclipse.xtext.common.Terminals
+grammar org.xtext.example.mydsl.MyDsl hidden(WS, ML_COMMENT, SL_COMMENT)
+
 import "http://www.eclipse.org/emf/2002/Ecore" as ecore
 generate myDsl "http://www.xtext.org/example/mydsl/MyDsl"
 
-//org.xtext.example.mydsl.Terminals
 Model:
 	TPTP_input+=include*
 	(TPTP_input+=tff_input*);
@@ -12,25 +11,25 @@ include:
 	'include(' path=STRING ').';
 
 tff_input:
-	tff_annotated | include;
+	tff_root | include;
 
-tff_annotated:
+tff_root:
 	('tff(' name=(LOWER_TOKEN | STRING)
 	',' formula_role=('axiom' | 'hypothesis' | 'negated_conjecture' | 'conjecture' | 'definition' | 'lemma')
-	',' def=tff_expression
-	//TODO: <annotations>?
+	',' exp=tff_expression
 	').')
 	|
 	('tff(' name=(LOWER_TOKEN | STRING)
 	',' formula_role=('type')
 	',' def=tff_formula_type_definition
-	//TODO: <annotations>?
 	').');
 
 tff_formula_type_definition:
 	'(' tff_formula_type_definition ')' |
-	((name=LOWER_TOKEN | name=STRING) ':' exp=(tff_type_quantifier_epression|tff_type_expression));
+	((name=LOWER_TOKEN | name=STRING) ':' exp=(tff_type_quantifier_epression | tff_type_expression));
 
+	//these operators are left associative, as god intended
+//TODO: should we AST modle these as tff_type_constant with 2 params?
 tff_type_expression:
 	tff_terminal_type_expression ({oper.left=current} op=('>' | '*') right+=tff_terminal_type_expression)*;
 
@@ -40,42 +39,43 @@ tff_terminal_type_expression returns tff_type_expression:
 tff_type_atom:
 	tff_type_constant |
 	tff_var |
-	tff_type_literal ;
+	tff_type_literal;
 
 tff_type_constant:
 	name=(LOWER_TOKEN | STRING) ('(' param+=tff_type_atom (',' param+=tff_type_atom)* ')')?;
 
-tff_type_literal returns tff_type_atom:
-	tff_type_atom =('$i' | '$o' | '$tType' | '$int' | '$real' | '$rat');
+//TODO: don't suport edgecase:
+//tff(sorted_type,type,(
+//    sorted: "$i" )).
+
+tff_type_literal returns tff_type_constant:
+	name=('$i' | '$o' | '$tType' | '$int' | '$real' | '$rat');
 
 tff_expression:
-	tff_terminating_expression ({binary.left=current} op=binary_operator right=tff_terminating_expression)*
-;
+	tff_terminating_expression ({binary.left=current} op=binary_operator right=tff_terminating_expression)*;
 
 tff_terminating_expression returns tff_expression:
 	atom=tff_atom |
-	'(' exp=tff_expression ')' |
+	'(' tff_expression ')' |
 	negation?='~' exp=tff_expression |
-	exp=tff_quantifier_epression
-;
+	exp=tff_quantifier_epression;
 
 tff_atom:
+	tff_var |
 	tff_atom_literal |
 	tff_constant |
-	tff_var |
 	tff_predefined_function_1_args |
 	tff_predefined_function_2_args;
 
-tff_atom_literal returns tff_atom:
-	tff_atom=('$true' |
-	'$false')
-;
-
 tff_constant:
 	(name=(LOWER_TOKEN | STRING) ('(' param+=tff_atom (',' param+=tff_atom)* ')')?)
-	| ( top=(LOWER_TOKEN) name='/' bottom=(LOWER_TOKEN));//TODO: what is the best way to represent these horrible fraction types
+	| (top=(LOWER_TOKEN) name='/' bottom=(LOWER_TOKEN)) //TODO: what is the best way to represent these horrible fraction types
+;
 
-	//tff_predefined_constant:;
+tff_atom_literal returns tff_constant:
+	name=('$true' |
+	'$false');
+
 tff_predefined_function_1_args returns tff_constant:
 	name=('$is_int' | '$is_rat' //ANYTHING -> BOOL
 	| '$uminus' // NUM -> NUM ?
@@ -85,15 +85,14 @@ tff_predefined_function_1_args returns tff_constant:
 )
 	'(' param+=tff_expression ')';
 
-tff_predefined_function_2_args :
-	//TODO: rename
-	func=('$less' | '$sum' | '$difference' | '$product' |
-	'$quotient' | '$quotient_e' | '$quotient_t' | '$quotient_f' |
-	'$remainder_e' | '$remainder_t' | '$remainder_f' | '$greatereq'
-	| '$lesseq' | '$greater' | '$eq'
+	//TODO: make this returns tff_constant:
+//TODO: change func to name
+//TODO: possibly file a bug
+tff_predefined_function_2_args: //; returns tff_constant:
+	func=('$less' | '$sum' | '$difference' | '$product' | '$quotient' | '$quotient_e' | '$quotient_t' | '$quotient_f' |
+	'$remainder_e' | '$remainder_t' | '$remainder_f' | '$greatereq' | '$lesseq' | '$greater' | '$eq'
 	//also $distinct
-	)
-	'(' param+=tff_expression ',' param+=tff_expression ')';
+) '(' param+=tff_expression ',' param+=tff_expression ')';
 
 tff_var:
 	name=UPPER_TOKEN;
@@ -102,16 +101,13 @@ tff_var_declaration:
 	var=tff_var ':' vartype=tff_type_expression;
 
 tff_quantifier_epression returns tff_expression:
-	quantifier=(
-	'!' // for all
-	| '?'//there exists
-	) '[' param=tff_variable_list ']' ':' exp=tff_expression;
-
+	quantifier=('!' // for all
+	| '?' //there exists
+) '[' param=tff_variable_list ']' ':' exp=tff_expression;
 
 tff_type_quantifier_epression returns tff_expression:
-	quantifier=(
-	'!>'//????
-	) '[' param=tff_variable_list ']' ':' exp=tff_type_expression;  //TODO: the syntax colisions here are insane! what does ":" mean?
+	quantifier=('!>' //????
+) '[' param=tff_variable_list ']' ':' exp=tff_type_expression; //TODO: the syntax colisions here are insane! what does ":" mean?
 
 tff_variable_list:
 	params+=tff_var_declaration (',' params+=tff_var_declaration)*;
@@ -125,7 +121,7 @@ binary_operator:
 	//infix ~& for negated conjunction (NAND), infix @ for application.
 ;
 
-//TODO: treate munber distinctly from UPPER_TOKEN and LOWER_TOKEN 
+//TODO: how does prolog officialy handle NUMBERs, LOWER_TOKEN, and UPPER_TOKEN
 //terminal NUMBER:
 //	'-'? ('0'..'9')+;
 
