@@ -170,9 +170,9 @@ cnf_input:
         cnf_root | include;
 
 cnf_root:
-        'cnf(' name=LOWER_TOKEN
+        'cnf(' name=(LOWER_TOKEN | STRING)
         ',' formula_role=('axiom'|'hypothesis'|'negated_conjecture')
-        ',' def=cnf_formula_type_definition 
+        ',' exp=cnf_formula_type_definition 
         ').'
 ;
 
@@ -188,7 +188,7 @@ cnf_not:
         (negated?='~')? literal=cnf_equality; //TODO: cange nagated to something that is true when the formula is true and false otherwise
 
 //TODO: merge down
-cnf_equality: expL=cnf_exp (eq=('='|'!=') expR=cnf_exp )?;
+cnf_equality: expL=cnf_expression (eq=('='|'!=') expR=cnf_expression )?;
 
 //TODO: file bug report:
 //cnf_not:
@@ -196,17 +196,18 @@ cnf_equality: expL=cnf_exp (eq=('='|'!=') expR=cnf_exp )?;
 //
 //cnf_equality: cnf_exp '=' cnf_exp;
 
-cnf_exp: cnf_constant | cnf_var | cnf_exp=cnf_statement_literal;
+cnf_expression: cnf_constant | cnf_var | cnf_exp=cnf_statement_literal;
 
 cnf_constant:
-        name=(LOWER_TOKEN | STRING) ('('param+=cnf_exp(','param+=cnf_exp)*')')?
+        name=(LOWER_TOKEN | STRING) ('('param+=cnf_expression(','param+=cnf_expression)*')')?
 ;
 cnf_var:
         name=UPPER_TOKEN
 ;
 //TODO: tooltip doc
 //TODO: make more DRY
-cnf_statement_literal:'$true'|'$false';
+cnf_statement_literal:
+	'$true'|'$false';
 
 
 
@@ -224,12 +225,12 @@ thf_input:
         thf_root | include;
 
 thf_root:
-        'thf(' name=LOWER_TOKEN
+        'thf(' name=(LOWER_TOKEN | STRING)
         ',' formula_role='type'
         ',' def=thf_formula_type_definition
         ').'
         |
-        'thf(' name=LOWER_TOKEN
+        'thf(' name=(LOWER_TOKEN | STRING)
         ',' formula_role=('axiom'|'hypothesis'|'conjecture') 
         ',' thf_exp=thf_statement 
         ').'
@@ -246,6 +247,7 @@ thf_type_name:
 thf_type_expresion:
         thf_terminal_type_expresion ('>' thf_terminal_type_expresion)*;
          //type=[thf_formula_type_definition]
+         
 thf_terminal_type_expresion:
         thf_type_name | '('thf_type_expresion')';
 
