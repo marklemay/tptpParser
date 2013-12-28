@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature id="com.theoremsandstuff.tptp.parser.sdk"
+	label="Parser SDK Feature "
+	version="1.0.0.qualifier">
+	<plugin
+			id="com.theoremsandstuff.tptp.parser"
+			download-size="0"
+			install-size="0"
+			version="0.0.0"
+			unpack="false"/>
+	<plugin
+			id="com.theoremsandstuff.tptp.parser.ui"
+			download-size="0"
+			install-size="0"
+			version="0.0.0"
+			unpack="false"/>
+</feature>

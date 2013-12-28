@@ -1,0 +1,9 @@
+grammar com.theoremsandstuff.tptp.Parser with org.eclipse.xtext.common.Terminals
+
+generate parser "http://www.theoremsandstuff.com/tptp/Parser"
+
+Model:
+	greetings+=Greeting*;
+	
+Greeting:
+	'Hello' name=ID '!';
