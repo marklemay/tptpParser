@@ -3,7 +3,7 @@ tptpParser
 
 An xtext based parser for the tptp grammer (http://www.cs.miami.edu/~tptp).  (can be used to generate a java parser, and may lead to an awesome eclipse plugin)
 
-this is built with xtext v2.4.3, and I welcom all patches and pull requests!
+this is built with xtext v2.4.3, and we welcome all patches and pull requests!
 
 If you use this libray, I'd love to hear about it!
 
