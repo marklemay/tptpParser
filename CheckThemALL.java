@@ -52,8 +52,18 @@ public class CheckThemALL {
 	 *             when errors occur during the parsing process
 	 */
 	public EObject parse(String path) throws IOException {
-//				System.out.println(path );
-		Reader reader = new BufferedReader(new FileReader(path));
+		// System.out.println(path );
+		File file = new File(path);
+		if (!readable(file)) {
+			return null;
+		}
+		if (file.length() > 70000000) {
+			System.out.println("(" + path + ") is too big " + file.length());
+			return null;
+		}
+
+		Reader reader = new BufferedReader(new FileReader(file));
+
 		IParseResult result = parser.parse(reader);
 
 		if (result.hasSyntaxErrors()) {
@@ -67,43 +77,63 @@ public class CheckThemALL {
 		return result.getRootASTElement();
 	}
 
-	public static void main(String[] args) throws IOException {
-//		File directory = new File("C:\\tptp\\fof\\axioms\\");
-		//		File directory = new File("C:\\tptp\\fof\\problems\\");
-//		File directory = new File("C:\\tptp\\cnf\\problems\\");
-//		File directory = new File("C:\\tptp\\cnf\\axioms\\");
-//		File directory = new File("C:\\tptp\\thf\\axioms\\");
-//		File directory = new File("C:\\tptp\\thf\\problems\\");
-//		File directory = new File("C:\\tptp\\tff\\axioms\\");
-		File directory = new File("C:\\tptp\\tff\\problems\\");
-		
+	public static boolean readable(File f) {
+
+		switch (f.getName()) {
+		// ignoreing advanced syntax quirks that are never used
+		case "SYN000+2.p":
+		case "SYN000-2.p":
+		case "SYN000=2.p":
+		case "SYN000^2.p":
+		case "SYN000_2.p":
+
+			// using the symbol "&" as a constant within an atom, wich is just
+			// absurd
+		case "SYO025^1.p":
+			// '~' as a constant within an atom
+		case "SYO042^1.p":
+		case "SYO042^2.p":
+		case "SYO544^1.p":
+		case "SYO545^1.p":
+		case "SYO546^1.p":
+
+			// use of the pedefined '$distinct' construct.
+		case "SYO561_1.p":
+			// use of the pedefined '$ite_f' construct.
+		case "SYO562_1.p":
+
+			// use of fractions in fof
+		case "SYO563+2.p":
+
+			return false;
+		default:
+			return true;
+		}
+	}
+
+	public static void ceckDir(File directory) {
 		for (File file : directory.listFiles()) {
 			try {
-				CheckThemALL cta = new CheckThemALL();
-				cta.parse(file.getAbsolutePath());
+				if (file.isDirectory()) {
+					ceckDir(file);
+				} else {
+					CheckThemALL cta = new CheckThemALL();
+					cta.parse(file.getAbsolutePath());
+				}
 			} catch (Exception e) {
 				System.out.println("(" + file.getAbsolutePath() + ":" + e);
 			}
 		}
-		// InternalMyDslLexer lex = new InternalMyDslLexer(new
-		// ANTLRFileStream("C:\\tptp\\cnf\\TOP016-1.p"));
-		// CommonTokenStream tokens = new CommonTokenStream(lex);
-		//
-		//
-		// InternalMyDslParser parser = new InternalMyDslParser(tokens);
-		//
-		// // try {
-		// parser.getSourceName();//.expr();
-		// try {
-		// IParseResult result = parser.parse();
-		// result.getSyntaxErrors();
-		// } catch (RecognitionException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		// parser.getNumberOfSyntaxErrors();
-		// // } catch (RecognitionException e) {
-		// // e.printStackTrace();
-		// // }
+	}
+
+	public static void main(String[] args) throws IOException {
+		File directory = new File("C:\\tptp\\TPTP-v6.0.0\\TPTP-v6.0.0\\Axioms");
+		ceckDir(directory);
+		// compitition problems from last year (without solutions and batch
+		// files)
+		directory = new File("C:\\tptp\\Problems\\Problems");
+		ceckDir(directory);
+		directory = new File("C:\\tptp\\TPTP-v6.0.0\\TPTP-v6.0.0\\Problems");
+		ceckDir(directory);
 	}
 }
