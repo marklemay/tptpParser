@@ -1,74 +1,341 @@
-grammar org.xtext.example.mydsl.MyDsl hidden(WS, ML_COMMENT, SL_COMMENT) //with org.eclipse.xtext.common.Terminals
-//with org.eclipse.xtext.common.Terminals
+grammar org.xtext.example.mydsl.MyDsl hidden(WS, ML_COMMENT, SL_COMMENT)
+
 import "http://www.eclipse.org/emf/2002/Ecore" as ecore
 generate myDsl "http://www.xtext.org/example/mydsl/MyDsl"
 
-//org.xtext.example.mydsl.Terminals
 Model:
 	TPTP_input+=include*
-	(TPTP_input+=fof_input*);
+	(TPTP_input+=fof_input* | 
+	TPTP_input+=tff_input* |
+	TPTP_input+=cnf_input* |
+	TPTP_input+=thf_input*
+	);
 
 include:
 	'include(' path=STRING ').';
 
 fof_input:
-	fof_annotated | include;
+	fof_root | include;
 
-fof_annotated:
-       'fof(' name=(LOWER_TOKEN|STRING) //TODO: spec
-        ',' formula_role=('axiom' | 'hypothesis' | 'negated_conjecture' | 'conjecture' | 'definition' | 'lemma') 
-	',' def=fof_expression //TODO: spec
-	//TODO: <annotations>
+fof_root:
+	'fof(' name=(lower_token_and_keyword | STRING)
+	',' formula_role=('axiom' | 'hypothesis' | 'negated_conjecture' | 'conjecture' | 'definition' | 'lemma')
+	',' exp=fof_expression
 	').';
 
 fof_expression:
 	fof_terminating_expression ({binary.left=current} op=binary_operator right=fof_terminating_expression)*
-	//fof_exists |
-	//fof_for_all |
-	;
+;
 
 fof_terminating_expression returns fof_expression:
-	atom=fof_atom |
-	'(' exp=fof_expression ')' |
-	negation?='~' exp=fof_expression |
-	exp=fof_exists |
-	exp=fof_for_all
-;
+	fof_atom=fof_atom |
+	'(' fof_expression ')' |
+	fof_negation?='~' fof_exp = fof_expression | //TODO: fix nesting expression problem
+	fof_exp=fof_quantifier_expression;
 
 fof_atom:
-	fof_constant | 
-	fof_var | 
-	fof_statement_literal
-;
+	fof_constant |
+	fof_var |
+	fof_atom_literal;
 
-fof_statement_literal returns fof_atom:
-	atom=('$true' |
+fof_atom_literal returns fof_constant:
+	name=('$true' |
 	'$false')
-	//TODO: rename?
-;
+	;
 
 fof_constant:
-        name=(LOWER_TOKEN | STRING) ('('param+=fof_atom(','param+=fof_atom)*')')?
-;
+	name=(lower_token_and_keyword | STRING) ('(' fof_param+=fof_atom (',' fof_param+=fof_atom)* ')')?;
 
 fof_var:
-        name=UPPER_TOKEN
-        ;
-        
-fof_exists returns fof_expression:
-	'?' '[' param=fof_variable_list ']' ':' exp=fof_expression
-;
-
-fof_for_all returns fof_expression:
-	'!' '[' param=fof_variable_list ']' ':' exp=fof_expression
-;
+	name=UPPER_TOKEN;
+	
+fof_quantifier_expression returns fof_expression:
+	fof_quantifier=('!' // for all
+        | '?' //there exists
+) '[' fof_param=fof_variable_list ']' ':' fof_exp=fof_expression;
 
 fof_variable_list:
-	params+=fof_var (',' params+=fof_var)*
+	params+=fof_var (',' params+=fof_var)*;
+
+////////////////////////////////////////////////////////////////////////////
+// TFF
+
+
+tff_input:
+        tff_root | include;
+
+tff_root:
+        ('tff(' name=(lower_token_and_keyword | STRING)
+        ',' formula_role=('axiom' | 'hypothesis' | 'negated_conjecture' | 'conjecture' | 'definition' | 'lemma')
+        ',' exp=tff_expression
+        ').')
+        |
+        ('tff(' name=(lower_token_and_keyword | STRING)
+        ',' formula_role=('type')
+        ',' def=tff_formula_type_definition
+        ').');
+
+tff_formula_type_definition:
+        '(' tff_formula_type_definition ')' |
+        ((name=lower_token_and_keyword | name=STRING) ':' exp=(tff_type_quantifier_epression | tff_type_expression));
+
+        //these operators are left associative, as god intended
+//TODO: should we AST modle these as tff_type_constant with 2 params?
+tff_type_expression:
+        tff_terminal_type_expression ({oper.left=current} op=('>' | '*') right+=tff_terminal_type_expression)*;
+
+tff_terminal_type_expression returns tff_type_expression:
+        tff_type_atom | '(' tff_type_expression ')';
+
+tff_type_atom:
+        tff_type_constant |
+        tff_var |
+        tff_type_literal;
+
+tff_type_constant:
+        name=(lower_token_and_keyword | STRING) ('(' param+=tff_type_atom (',' param+=tff_type_atom)* ')')?;
+
+//TODO: don't support edgecase:
+//tff(sorted_type,type,(
+//    sorted: "$i" )).
+
+tff_type_literal returns tff_type_constant:
+        name=('$i' | '$o' | '$tType' | '$int' | '$real' | '$rat');
+
+tff_expression:
+        tff_terminating_expression ({binary.left=current} op=binary_operator right=tff_terminating_expression)*;
+
+tff_terminating_expression returns tff_expression:
+        atom=tff_atom |
+        '(' tff_expression ')' |
+        negation?='~' exp=tff_expression |
+        exp=tff_quantifier_expression;
+
+tff_atom:
+        tff_var |
+        tff_atom_literal |
+        tff_constant |
+        tff_predefined_function_1_args |
+        tff_predefined_function_2_args;
+
+tff_constant:
+        (name=(lower_token_and_keyword | STRING) ('(' param+=tff_atom (',' param+=tff_atom)* ')')?)
+        | (top=(lower_token_and_keyword) name='/' bottom=(lower_token_and_keyword)) //TODO: what is the best way to represent these horrible fraction types
 ;
 
+tff_atom_literal returns tff_constant:
+        name=('$true' |
+        '$false');
+
+tff_predefined_function_1_args returns tff_constant:
+        name=('$is_int' | '$is_rat' //ANYTHING -> BOOL
+        | '$uminus' // NUM -> NUM ?
+        | '$to_int' //ANYTHING? -> INT
+        | '$to_rat' //ANYTHING? -> RAT
+        | '$to_real' //ANYTHING? -> REAL
+)
+        '(' param+=tff_expression ')';
+
+        //TODO: make this returns tff_constant:
+//TODO: change func to name
+//TODO: possibly file a bug
+tff_predefined_function_2_args: //; returns tff_constant:
+        func=('$less' | '$sum' | '$difference' | '$product' | '$quotient' | '$quotient_e' | '$quotient_t' | '$quotient_f' |
+        '$remainder_e' | '$remainder_t' | '$remainder_f' | '$greatereq' | '$lesseq' | '$greater' | '$eq'
+        //also $distinct
+) '(' param+=tff_expression ',' param+=tff_expression ')';
+
+tff_var:
+        name=UPPER_TOKEN;
+
+tff_var_declaration:
+        var=tff_var ':' vartype=tff_type_expression;
+
+tff_quantifier_expression returns tff_expression:
+        quantifier=('!' // for all
+        | '?' //there exists
+) '[' param=tff_variable_list ']' ':' exp=tff_expression;
+
+tff_type_quantifier_epression returns tff_expression:
+        quantifier=('!>' //????
+) '[' param=tff_variable_list ']' ':' exp=tff_type_expression; //TODO: the syntax colisions here are insane! what does ":" mean?
+
+tff_variable_list:
+        params+=tff_var_declaration (',' params+=tff_var_declaration)*;
+
+//////////////////////////////////////////////////////////////////////////////////
+// CNF
+
+cnf_input:
+        cnf_root | include;
+
+cnf_root:
+        'cnf(' name=(lower_token_and_keyword | STRING)
+        ',' formula_role=('axiom'|'hypothesis'|'negated_conjecture' | 
+        'plain'//TODO: check if this has been depricated
+        )
+        ',' exp=cnf_formula_type_definition 
+        ').'
+;
+
+cnf_formula_type_definition:
+        '(' disjunction=cnf_or ')' |
+        disjunction=cnf_or;
+
+cnf_or:
+        or+=cnf_not ('|' or+=cnf_not)*
+;
+
+cnf_not:
+        (negated?='~')? literal=cnf_equality; //TODO: cange nagated to something that is true when the formula is true and false otherwise
+
+//TODO: merge down
+cnf_equality: expL=cnf_expression (eq=('='|'!=') expR=cnf_expression )?;
+
+//TODO: file bug report:
+//cnf_not:
+//        ('~')? (cnf_exp | cnf_equality);
+//
+//cnf_equality: cnf_exp '=' cnf_exp;
+
+cnf_expression: cnf_constant | cnf_var | cnf_exp=cnf_statement_literal;
+
+cnf_constant:
+        name=(lower_token_and_keyword | STRING) ('('param+=cnf_expression(','param+=cnf_expression)*')')?
+;
+cnf_var:
+        name=UPPER_TOKEN
+;
+//TODO: tooltip doc
+//TODO: make more DRY
+cnf_statement_literal:
+	'$true'|'$false';
+
+
+
+//TODO: compile time type checking would be super cool
+
+//TODO: should only be able to import file of the same language
+//TODO: import magic
+
+/////////////////////////////////////////////////////////////////////////
+// THF
+
+
+
+thf_input:
+        thf_root | include;
+
+thf_root:
+        'thf(' name=(lower_token_and_keyword | STRING)
+        ',' formula_role='type'
+        ',' def=thf_formula_type_definition
+        ').'
+        |
+        'thf(' name=(lower_token_and_keyword | STRING)
+        ',' formula_role=('axiom' | 'hypothesis' | 'negated_conjecture' | 'conjecture' | 'definition' | 'lemma') 
+        ',' thf_exp=thf_expression 
+        ').'
+        ;
+
+
+thf_formula_type_definition:
+        '(' thf_formula_type_definition ')' |
+        (name=(lower_token_and_keyword | STRING) ':' exp=(//thf_type_quantifier_epression| 
+        	thf_type_expression
+        ));
+
+        //these operators are left associative, as god intended
+//TODO: should we AST modle these as tff_type_constant with 2 params?
+thf_type_expression:
+        thf_terminal_type_expression ({oper.left=current} op=('>') right+=thf_terminal_type_expression)*;
+
+
+thf_terminal_type_expression returns thf_type_expression:
+       thf_type_atom
+         | '(' thf_type_expression ')';
+
+
+thf_type_atom:
+        thf_type_constant |
+//        thf_var |
+        thf_type_literal;
+
+thf_type_constant:
+        name=(lower_token_and_keyword | STRING) ;//('(' param+=tff_type_atom (',' param+=tff_type_atom)* ')')?;
+
+thf_type_literal returns thf_type_constant:
+        name=('$i' | '$o' | '$tType'); //type=[thf_formula_type_definition]
+        
+thf_expression:
+        thf_terminating_expression ({binary.left=current} op=thf_binary_operator right=thf_terminating_expression)*;
+
+thf_terminating_expression returns thf_expression:
+        thf_atom=thf_atom |
+        '(' thf_expression ')' |
+        thf_negation?='~' thf_exp=thf_expression |
+        op=thf_unary_operator  thf_exp=thf_expression |
+        thf_exp=thf_quantifier_expression;
+
+//I don't know what the fuck any of these do
+thf_unary_operator:
+	'@' | '??' | '!!' | '&' |'|' | '=>'
+;
+
+thf_binary_operator:
+        '&' | '=>' | '|'
+                |'@'// (denoting apply) is left-associative and lambda is right-associative. //TODO: deal with asocativity crap
+//^ [X] : ^ [Y] : f @ g (where f is a <thf_apply_formula> and g is a
+//<thf_unitary_formula>) should be parsed as: (^ [X] : (^ [Y] : f)) @ g.
+//That is, g is not in the scope of either lambda.
+|'='//TODO: how is this actualy defined?
+|'!='
+|'<='
+|'<=>'
+|'<~>'
+;
+
+thf_atom:
+	thf_constant |
+	thf_var |
+	thf_atom_literal;
+
+
+thf_atom_literal returns thf_constant:
+	name=('$true' |
+	'$false')
+	;
+
+thf_constant:
+	name=(lower_token_and_keyword | STRING) ('(' thf_param+=thf_atom (',' thf_param+=thf_atom)* ')')?;
+
+thf_var:
+	name=UPPER_TOKEN;
+	
+thf_quantifier_expression returns tff_expression:
+        quantifier=('!' // for all
+        | '?' //there exists
+        | '^'
+) '[' param=thf_variable_list ']' ':' exp=thf_expression;
+	
+	
+thf_variable_list:
+        params+=thf_var_declaration (',' params+=thf_var_declaration)*;
+        
+        
+thf_var_declaration:
+        var=thf_var ':' vartype=thf_type_expression;
+        
+ //
+//thf_type_statement: type=thf_type |'('thf_type_statement')';// | left=thf_type_statement '>' right=thf_type_statement;
+//
+
+
+
+////////////////////////////////////////////////////////////////////////////
+// shared
 binary_operator:
-	'!=' | '=' | '|' | '&' | '=>' | '<=>' | '<=' | '<~>' | '~|' | '~&' 
+	'!=' | '=' | '|' | '&' | '=>' | '<=>' | '<=' | '<~>' | '~|' | '~&'
 	//The binary connectives are infix | for disjunction, 
 	//infix & for conjunction, infix <=> for equivalence, 
 	//infix => for implication, infix <= for reverse implication, 
@@ -76,6 +343,18 @@ binary_operator:
 	//infix ~& for negated conjunction (NAND), infix @ for application.
 ;
 
+lower_token_and_keyword:
+	//this repitition is for autocomplete
+	'axiom' | 'hypothesis' | 'negated_conjecture' | 'conjecture' | 'definition' | 'lemma'
+	|'type'
+	| 'plain'
+	 | LOWER_TOKEN
+;
+//
+//role:
+//	'axiom' | 'hypothesis' | 'negated_conjecture' | 'conjecture' | 'definition' | 'lemma'
+//	//'axiom'|'hypothesis'|'negated_conjecture' cnf/thf only?
+//;
 
 terminal LOWER_TOKEN:
         ('a'..'z' | '_' | '-' | '.' | '0'..'9') ('a'..'z' | 'A'..'Z' | '_' | '-' | '.' | '0'..'9')*;
@@ -95,5 +374,3 @@ terminal SL_COMMENT:
 
 terminal WS:
         (' ' | '\t' | '\r' | '\n')+;
-
-
