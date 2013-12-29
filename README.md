@@ -74,11 +74,15 @@ global TODOs
  - [ ] set up continous integration
 - other stuff
 - [x] what is the best way to do this? http://stackoverflow.com/questions/20253044/string-constants-causeing-unexpected-type-collisions-in-xtext/20280540?noredirect=1#20280540
-- [ ] merge the seperate implimentations, make things handld more consistently
+- [x] merge the seperate implimentations, make things handld more consistently
 - [ ] review the modles for name clarity (and spelling)
 - [ ] review prolog number, variable, and constant syntax
 - [ ] seperate antlr parser directory (may just be a copy and past procedure)
-- [ ] eclipse download site
+ - [ ] write download instructions in the readme
+ - [ ] create a simple demo project that imports it?
+- [x] eclipse download site (marklemay.github.io/tptpParser/site.p2)
+ - [ ] write download instructions in the readme
+ - [ ] add a picture!
 - [ ] deploy to maven
 - [ ] Continous integration setup
 - [ ] seperate sublangues into seperate files
