@@ -89,11 +89,13 @@ global TODOs
 - [ ] autoformater
 - [ ] tooltip hints
 - [ ] file linking with the include directive (include from only the same language)
+- [ ] eclipse icon?
 - [ ] compiletime validation of linking and type checking
 - [ ] comment meta info tagging
 - [ ] seperate eclipse plugins that could just target the sublanguages? most users don't need all 
 - [ ] embed version number in the nuild properties
 - [ ] why doesn't this work https://github.com/blog/1375-task-lists-in-gfm-issues-pulls-comments
+- [ ] write shameless self premotion about the project leaders.
 
 currently unsuported
 TODO
