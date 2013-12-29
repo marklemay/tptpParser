@@ -1,6 +1,7 @@
 package org.xtext.example.mydsl.tests;
 
-///org.xtext.example.mydsl.tests/src/org/xtext/example/mydsl/tests/CheckThemALL.java
+
+////com.theoremsandstuff.tptp.parser.tests/src/org/xtext/example/mydsl/tests/CheckThemALL.java
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
