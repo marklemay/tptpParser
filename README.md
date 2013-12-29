@@ -57,8 +57,23 @@ The design principles
 
 global TODOs
 ----------
-- [ ] houscleaning
-- [ ] what is the best way to do this? http://stackoverflow.com/questions/20253044/string-constants-causeing-unexpected-type-collisions-in-xtext/20280540?noredirect=1#20280540
+- houscleaning
+ - [ ] currently unsuported files section
+  - [ ] unsuported problems list from https://github.com/marklemay/tptpParser/blob/master/com.theoremsandstuff.tptp.parser.tests/src/com/theoremsandstuff/tptp/parser/tests/CheckThemALL.java
+  - [ ] untested problems list from https://github.com/marklemay/tptpParser/blob/master/com.theoremsandstuff.tptp.parser.tests/src/com/theoremsandstuff/tptp/parser/tests/CheckThemALL.java
+ - [ ] link the links in readme
+ - [ ] clarify design principals
+ - [ ] delete tmp
+ - [ ] check spelling
+ - [ ] reactivate theoremsandstuff.com
+ - [ ] ...capitalization?
+ - [ ] see what other ignored thingsdo'nt need to be checked in
+- tests
+ - [ ] make tests more paramiterized
+ - [ ] make tests paramiterized junit tests
+ - [ ] set up continous integration
+- other stuff
+- [x] what is the best way to do this? http://stackoverflow.com/questions/20253044/string-constants-causeing-unexpected-type-collisions-in-xtext/20280540?noredirect=1#20280540
 - [ ] merge the seperate implimentations, make things handld more consistently
 - [ ] review the modles for name clarity (and spelling)
 - [ ] review prolog number, variable, and constant syntax
