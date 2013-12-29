@@ -1,4 +1,4 @@
-package org.xtext.example.mydsl.tests;
+package com.theoremsandstuff.tptp.parser.tests;
 
 
 ////com.theoremsandstuff.tptp.parser.tests/src/org/xtext/example/mydsl/tests/CheckThemALL.java
@@ -8,19 +8,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 
-import org.antlr.runtime.ANTLRFileStream;
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.RecognitionException;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.nodemodel.INode;
 import org.eclipse.xtext.parser.IParseResult;
 import org.eclipse.xtext.parser.IParser;
-import org.eclipse.xtext.parser.ParseException;
-import org.xtext.example.mydsl.MyDslRuntimeModule;
-import org.xtext.example.mydsl.MyDslStandaloneSetup;
-import org.xtext.example.mydsl.parser.antlr.internal.InternalMyDslLexer;
-import org.xtext.example.mydsl.parser.antlr.internal.InternalMyDslParser;
-
+import com.theoremsandstuff.tptp.ParserRuntimeModule;
+import com.theoremsandstuff.tptp.ParserStandaloneSetup;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -30,14 +23,14 @@ public class CheckThemALL {
 	@Inject
 	private IParser parser;
 
-	Injector injector = Guice.createInjector(new MyDslRuntimeModule());
+	Injector injector = Guice.createInjector(new ParserRuntimeModule());
 
 	public CheckThemALL() {
 		setupParser();
 	}
 
 	private void setupParser() {
-		Injector injector = new MyDslStandaloneSetup()
+		Injector injector = new ParserStandaloneSetup()
 				.createInjectorAndDoEMFRegistration();
 		injector.injectMembers(this);
 	}
