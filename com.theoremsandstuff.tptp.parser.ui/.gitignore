@@ -1,0 +1,12 @@
+#provisionaly ignore (regenerate these defualts, but we may decide costomize them in the furute)
+src
+
+#unsure about how much of these are generated
+META-INF
+plugin.xml
+
+#permenently ignore:
+src-gen
+xtend-gen
+
+bin
