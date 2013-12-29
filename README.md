@@ -5,17 +5,21 @@ An xtext based parser for the tptp grammer (http://www.cs.miami.edu/~tptp).  (ca
 
 this is built with xtext v2.4.3, and we welcome all patches and pull requests!
 
-If you use this libray, I'd love to hear about it!
+If you use this libray, we'd love to hear about it!
 
 
-The design principles are:
+
+
+The design principles
+----------
  * the primary goal is the generated java parser, the eclipse plugin (while realy cool) is secondary
  * minimal/restrictive AST, we will ignore issues that happen in the extended biased problems, keeping is simple and restrictive will make it easier to use in compitition programs
  * grammar should be restrictive, no need for multiple lanuages in the same file
  * validate against all sample problems, this should be compititiion ready software
  * keep the eventual java parser and the eventual eclipse plugin (and the target tptp problem set in sync with version numbers)
 
-global TODOs:
+global TODOs
+----------
  * what is the best way to do this? http://stackoverflow.com/questions/20253044/string-constants-causeing-unexpected-type-collisions-in-xtext/20280540?noredirect=1#20280540
  * merge the seperate implimentations, make things handld more consistently
  * review the modles for name clarity (and spelling)
