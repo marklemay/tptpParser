@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- contextQualifierLength=12 -->
+<feature
+      id="com.theoremsandstuff.tptp.parser.site"
+      label="com.theoremsandstuff.tptp.parser.site Feature"
+      version="1.0.0.201312291139-1--cOoG3U3124233_224_">
+
+   <includes
+         id="com.theoremsandstuff.tptp.parser.sdk"
+         version="1.0.0.201312291139"/>
+
+</feature>
