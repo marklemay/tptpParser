@@ -16,8 +16,8 @@ build.properties
 plugin.xml
 
 #permenently ignore:
-src-gen
-xtend-gen
+#src-gen #ignored locally to maintain the file file structture
+#xtend-gen
 
 bin
 

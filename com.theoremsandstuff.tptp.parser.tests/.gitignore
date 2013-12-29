@@ -5,6 +5,6 @@
 META-INF
 
 #permenently ignore:
-src-gen
+#src-gen
 
 bin

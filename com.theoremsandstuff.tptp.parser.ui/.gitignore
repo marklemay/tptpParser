@@ -6,7 +6,7 @@ META-INF
 plugin.xml
 
 #permenently ignore:
-src-gen
-xtend-gen
+#src-gen
+#xtend-gen
 
 bin
