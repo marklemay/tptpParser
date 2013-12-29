@@ -87,8 +87,9 @@ global TODOs
 - [ ] file linking with the include directive (include from only the same language)
 - [ ] compiletime validation of linking and type checking
 - [ ] comment meta info tagging
-- [ ] seperate eclipse plugins that could just target the sublanguages? most users don't need all 4
-- [ ] https://github.com/blog/1375-task-lists-in-gfm-issues-pulls-comments
+- [ ] seperate eclipse plugins that could just target the sublanguages? most users don't need all 
+- [ ] embed version number in the nuild properties
+- [ ] why doesn't this work https://github.com/blog/1375-task-lists-in-gfm-issues-pulls-comments
 
 currently unsuported
 TODO
