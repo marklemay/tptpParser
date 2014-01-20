@@ -3,12 +3,41 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>tptp</groupId>
 	<artifactId>parser</artifactId>
-	<version>0.0.4-SNAPSHOT</version>
+	<version>0.0.5-SNAPSHOT</version>
 
 	<!-- TODO: need to grab all the sorc dirs -->
 
 	<!-- http://javadeveloperslife.wordpress.com/2011/10/24/m2eclipse-plugin-execution-not-covered-by-lifecycle-configuration/ -->
 	<build>
+
+
+		<resources>
+			<resource>
+				<directory>src</directory>
+				<filtering>true</filtering>
+				<excludes>
+					<exclude>**/*.java</exclude>
+					<exclude>**/.gitignore</exclude>
+				</excludes>
+			</resource>
+			<resource>
+				<directory>src-gen</directory>
+				<filtering>true</filtering>
+				<excludes>
+					<exclude>**/*.java</exclude>
+					<exclude>**/.gitignore</exclude>
+				</excludes>
+			</resource>
+			<resource>
+				<directory>xtend-gen</directory>
+				<filtering>true</filtering>
+				<excludes>
+					<exclude>**/*.java</exclude>
+					<exclude>**/.gitignore</exclude>
+				</excludes>
+			</resource>
+		</resources>
+
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -29,7 +58,7 @@
 				</executions>
 			</plugin>
 
-<!-- Poor man's repo: http://stackoverflow.com/questions/14013644/hosting-a-maven-repository-on-github?answertab=votes#tab-top -->
+			<!-- Poor man's repo: http://stackoverflow.com/questions/14013644/hosting-a-maven-repository-on-github?answertab=votes#tab-top -->
 			<plugin>
 				<groupId>com.github.github</groupId>
 				<artifactId>site-maven-plugin</artifactId>

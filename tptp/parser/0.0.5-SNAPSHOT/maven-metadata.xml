@@ -2,35 +2,35 @@
 <metadata modelVersion="1.1.0">
   <groupId>tptp</groupId>
   <artifactId>parser</artifactId>
-  <version>0.0.4-SNAPSHOT</version>
+  <version>0.0.5-SNAPSHOT</version>
   <versioning>
     <snapshot>
-      <timestamp>20140120.225434</timestamp>
+      <timestamp>20140120.233103</timestamp>
       <buildNumber>1</buildNumber>
     </snapshot>
-    <lastUpdated>20140120225434</lastUpdated>
+    <lastUpdated>20140120233103</lastUpdated>
     <snapshotVersions>
       <snapshotVersion>
         <extension>jar</extension>
-        <value>0.0.4-20140120.225434-1</value>
-        <updated>20140120225434</updated>
+        <value>0.0.5-20140120.233103-1</value>
+        <updated>20140120233103</updated>
       </snapshotVersion>
       <snapshotVersion>
         <extension>pom</extension>
-        <value>0.0.4-20140120.225434-1</value>
-        <updated>20140120225434</updated>
+        <value>0.0.5-20140120.233103-1</value>
+        <updated>20140120233103</updated>
       </snapshotVersion>
       <snapshotVersion>
         <classifier>sources</classifier>
         <extension>jar</extension>
-        <value>0.0.4-20140120.225434-1</value>
-        <updated>20140120225434</updated>
+        <value>0.0.5-20140120.233103-1</value>
+        <updated>20140120233103</updated>
       </snapshotVersion>
       <snapshotVersion>
         <classifier>javadoc</classifier>
         <extension>jar</extension>
-        <value>0.0.4-20140120.225434-1</value>
-        <updated>20140120225434</updated>
+        <value>0.0.5-20140120.233103-1</value>
+        <updated>20140120233103</updated>
       </snapshotVersion>
     </snapshotVersions>
   </versioning>

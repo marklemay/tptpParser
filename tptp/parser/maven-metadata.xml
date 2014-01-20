@@ -4,8 +4,8 @@
   <artifactId>parser</artifactId>
   <versioning>
     <versions>
-      <version>0.0.4-SNAPSHOT</version>
+      <version>0.0.5-SNAPSHOT</version>
     </versions>
-    <lastUpdated>20140120225434</lastUpdated>
+    <lastUpdated>20140120233103</lastUpdated>
   </versioning>
 </metadata>
