@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>tptp</groupId>
 	<artifactId>parser</artifactId>
-	<version>0.0.3-SNAPSHOT</version>
+	<version>0.0.4-SNAPSHOT</version>
 
 	<!-- TODO: need to grab all the sorc dirs -->
 
@@ -29,6 +29,7 @@
 				</executions>
 			</plugin>
 
+<!-- Poor man's repo: http://stackoverflow.com/questions/14013644/hosting-a-maven-repository-on-github?answertab=votes#tab-top -->
 			<plugin>
 				<groupId>com.github.github</groupId>
 				<artifactId>site-maven-plugin</artifactId>
