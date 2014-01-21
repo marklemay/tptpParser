@@ -8,7 +8,11 @@ src/com/theoremsandstuff/tptp/generator
 src/com/theoremsandstuff/tptp/scoping
 src/com/theoremsandstuff/tptp/validation
 
+target
+
 model
+
+
 
 #unsure about how much of these are generated
 META-INF
