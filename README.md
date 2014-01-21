@@ -10,26 +10,32 @@ If you use this libray, we'd love to hear about it!
 Using the Parser
 ==========
 the eaisiest way is to add
-		<dependency>
-			<groupId>tptp</groupId>
-			<artifactId>parser</artifactId>
-			<version>0.0.6-SNAPSHOT</version>
-		</dependency>
+```xml
+<dependency>
+	<groupId>tptp</groupId>
+	<artifactId>parser</artifactId>
+	<version>0.0.6-SNAPSHOT</version>
+</dependency>
+```
 and
-	<repositories>
-		<repository>
-			<id>tptpParser-mvn-repo</id>
-			<url>https://raw.github.com/marklemay/tptpParser/mvn-repo/</url>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
-			</snapshots>
-		</repository>
-	</repositories>
+```xml
+<repositories>
+	<repository>
+		<id>tptpParser-mvn-repo</id>
+		<url>https://raw.github.com/marklemay/tptpParser/mvn-repo/</url>
+		<snapshots>
+			<enabled>true</enabled>
+			<updatePolicy>always</updatePolicy>
+		</snapshots>
+	</repository>
+</repositories>
+```
 to your maven pom.xml (we use the poor mans repo method http://stackoverflow.com/questions/14013644/hosting-a-maven-repository-on-github?answertab=votes#tab-top)
 
 
 you can also make your project directly dependent on the binary jar (https://raw.github.com/marklemay/tptpParser/mvn-repo/tptp/parser/0.0.6-SNAPSHOT/parser-0.0.6-20140121.033204-1.jar) or the source jar (https://raw.github.com/marklemay/tptpParser/mvn-repo/tptp/parser/0.0.6-SNAPSHOT/parser-0.0.6-20140121.033204-1.jar).  this is not recomended becuase you will need to download transitive dependencies.
+
+see the test file (https://github.com/marklemay/tptpParser/blob/master/com.theoremsandstuff.tptp.parser.tests/src/com/theoremsandstuff/tptp/parser/tests/CheckThemALL.java) for usage 
 
 
 Committing
