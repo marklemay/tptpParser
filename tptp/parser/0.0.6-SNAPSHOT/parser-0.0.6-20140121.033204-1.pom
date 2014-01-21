@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>tptp</groupId>
 	<artifactId>parser</artifactId>
-	<version>0.0.5-SNAPSHOT</version>
+	<version>0.0.6-SNAPSHOT</version>
 
 	<!-- TODO: need to grab all the sorc dirs -->
 
@@ -14,7 +14,7 @@
 		<resources>
 			<resource>
 				<directory>src</directory>
-				<filtering>true</filtering>
+				<filtering>false</filtering>
 				<excludes>
 					<exclude>**/*.java</exclude>
 					<exclude>**/.gitignore</exclude>
@@ -22,7 +22,7 @@
 			</resource>
 			<resource>
 				<directory>src-gen</directory>
-				<filtering>true</filtering>
+				<filtering>false</filtering>
 				<excludes>
 					<exclude>**/*.java</exclude>
 					<exclude>**/.gitignore</exclude>
@@ -30,7 +30,7 @@
 			</resource>
 			<resource>
 				<directory>xtend-gen</directory>
-				<filtering>true</filtering>
+				<filtering>false</filtering>
 				<excludes>
 					<exclude>**/*.java</exclude>
 					<exclude>**/.gitignore</exclude>
@@ -103,6 +103,10 @@
 	<properties>
 		<!-- github server corresponds to entry in ~/.m2/settings.xml -->
 		<github.global.server>github</github.global.server>
+
+
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
 	</properties>
 
 	<dependencies>
