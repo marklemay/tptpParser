@@ -45,7 +45,7 @@ Browsing the source
 ----------
 There is only 1 source file, [Parser.xtext](https://github.com/marklemay/tptpParser/blob/master/com.theoremsandstuff.tptp.parser/src/com/theoremsandstuff/tptp/Parser.xtext)
 
-Cdetailedheckout and build the project
+Checkout and build the project
 ----------
 * Open [eclipse with xtext](http://www.eclipse.org/Xtext/download.html)
 * window -> open perspective -> other -> Git Repository Exploring
