@@ -1,6 +1,8 @@
 tptpParser
 ==========
 
+![usage screenshot](https://github.com/marklemay/tptpParser/blob/master/doc/demo.png?raw=true)
+
 An xtext based parser for the [TPTP grammer](http://www.cs.miami.edu/~tptp).  (can be used as java parser, or an awesome eclipse plugin)
 
 This is built with xtext v2.4.3, and we welcome all patches and pull requests!
