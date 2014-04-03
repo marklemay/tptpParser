@@ -93,8 +93,8 @@ Before committing, run the tests against all axioms, all problems, and all of th
 The design principles
 ----------
  * the primary goal is the generated java parser, the eclipse plugin (while really cool) is secondary
- * minimal/restrictive AST, we will ignore issues that happen in the extended biased problems, keeping the AST simple and restrictive will make it easier to use in compitition programs
- * grammar should be restrictive, no need for multiple lanuages in the same file
+ * minimal/restrictive AST, we will ignore issues that happen in the extended biased problems, keeping the AST simple and restrictive will make it easier to use in competition programs
+ * grammar should be restrictive, no need for multiple languages in the same file
  * validate against all sample problems, this should be competition-ready software
  * keep the eventual java parser and the eventual eclipse plugin (and the target tptp problem set in sync with version numbers)
 
