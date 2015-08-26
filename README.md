@@ -21,7 +21,7 @@ In Eclipse
 
 Using the Parser
 ==========
-If you are using maven, the eaisiest way to use this project is to add
+If you are using Maven, the easiest way to use this project is to add
 ```xml
 <dependency>
 	<groupId>tptp</groupId>
