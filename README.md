@@ -45,7 +45,7 @@ and
 to your pom.xml (we use the [poor man's repo method](http://stackoverflow.com/questions/14013644/hosting-a-maven-repository-on-github?answertab=votes#tab-top))
 
 
-You can also make your project directly dependent on the [binary jar](https://raw.github.com/marklemay/tptpParser/mvn-repo/tptp/parser/0.0.6-SNAPSHOT/parser-0.0.6-20140121.033204-1.jar) or the [source jar](https://raw.github.com/marklemay/tptpParser/mvn-repo/tptp/parser/0.0.6-SNAPSHOT/parser-0.0.6-20140121.033204-1.jar).  This is not recomended becuase you will need to download transitive dependencies.
+You can also make your project directly dependent on the [binary jar](https://raw.github.com/marklemay/tptpParser/mvn-repo/tptp/parser/0.0.6-SNAPSHOT/parser-0.0.6-20140121.033204-1.jar) or the [source jar](https://raw.github.com/marklemay/tptpParser/mvn-repo/tptp/parser/0.0.6-SNAPSHOT/parser-0.0.6-20140121.033204-1.jar).  This is not recommended because you will need to download transitive dependencies.
 
 See the test file [CheckThemALL.java](https://github.com/marklemay/tptpParser/blob/master/com.theoremsandstuff.tptp.parser.tests/src/com/theoremsandstuff/tptp/parser/tests/CheckThemALL.java) for usage 
 
